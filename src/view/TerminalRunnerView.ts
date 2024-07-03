@@ -120,8 +120,10 @@ export class TerminalRunnerView implements vscode.WebviewViewProvider{
     private _handleRunCmd(message) {
         vscode.window.showInformationMessage(message.text);
         const terminal = this._getTerminal(message.terminalId);
+        console.log(terminal);
         terminal.show();
-        if (message.path !== '') {
+        console.log(message);
+        if (message.path) {
             terminal.sendText(`cd ${message.path}`, true);
         }
         terminal.sendText(message.text, true);

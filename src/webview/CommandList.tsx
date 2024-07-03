@@ -15,15 +15,6 @@ function CommandList (props: CommandListProps) {
     const elements = [];
     const commandGroups = props.commands;
 
-    const handleCmdBtnClick = (e) => {
-        vscode.postMessage({ 
-            command: 'run-cmd', 
-            text: e.target?.getAttribute('data-cmd'), 
-            terminalId: e.target?.getAttribute('data-terminal-id'),
-            path: e.target?.getAttribute('data-path')
-        });
-    };
-
     for (let group in commandGroups) {
         const groupItem = commandGroups[group];
         const groupConfig = groupItem['config'];
@@ -33,13 +24,17 @@ function CommandList (props: CommandListProps) {
             const cmdItem = groupItem['commands'][cmd];
             const terminalId = (groupConfig && groupConfig['terminal-id']) || undefined;
             const cmdPath = cmdItem['path'] || '';
+            console.log(cmdItem);
             cmds.push(<div className='mb-2'>
                 <VSCodeButton 
                     className='cmd-btn'
-                    onClick={ handleCmdBtnClick } 
-                    data-cmd={cmdItem['cmd']}
-                    data-path={ groupRootPath + cmdPath }
-                    data-terminal-id={ (groupItem['config'] && groupItem['config']['terminal-id']) || undefined }
+                    onClick={ () => {  
+                        vscode.postMessage({ 
+                            command: 'run-cmd', 
+                            text: cmdItem['cmd'], 
+                            terminalId: (groupItem['config'] && groupItem['config']['terminal-id']) || undefined,
+                            path: groupRootPath + cmdPath
+                        });} } 
                     title={cmdItem['cmd']}
                 ><div className='cmd-btn-txt'>{ cmd } {cmdPath !== '' ? <span className='cmd-path'>[ {cmdPath} ]</span> : ''}</div> </VSCodeButton>
             </div>);
