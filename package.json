@@ -1,0 +1,55 @@
+{
+  "name": "terminal-runner",
+  "displayName": "Terniman Runner",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "terminal-runner.TerminalRunnerView",
+          "name": "Terminal Runner"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "node ./esbuild.js",
+    "package": "NODE_ENV=production node ./esbuild.js",
+    "watch": "node ./esbuild.js --watch",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "@vscode/test-cli": "^0.0.4",
+    "@vscode/test-electron": "^2.3.8",
+    "@vscode/webview-ui-toolkit": "^1.4.0",
+    "esbuild": "^0.16.17",
+    "esbuild-plugin-copy": "^2.1.1",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3",
+    "yaml": "^2.3.4"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

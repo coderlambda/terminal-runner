@@ -1,0 +1,42 @@
+body {
+    padding: 4px;
+}
+
+.button-row {
+    margin-bottom: 4px;
+}
+
+.group-head {
+    margin: 8px 0;
+}
+
+.group-name {
+    font-size: 18px;
+    font-weight: bolder;
+}
+
+.group-root-path {
+    opacity: 0.9;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; 
+    width: 100%;
+}
+
+.mb-2 {
+    margin-bottom: 4px;
+}
+
+.cmd-btn {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.cmd-path {
+    opacity: 0.8;
+}
+
+.cmd-btn-txt {
+    text-align: left;
+    white-space: nowrap;
+}

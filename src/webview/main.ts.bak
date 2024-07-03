@@ -1,0 +1,113 @@
+import { Button, provideVSCodeDesignSystem, vsCodeButton, vsCodeDivider, vsCodeOption, vsCodeDropdown, Dropdown, Option } from "@vscode/webview-ui-toolkit";
+
+provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeDivider(), vsCodeDropdown(), vsCodeOption());
+
+const vscode = acquireVsCodeApi();
+let currentCmdListId: string;
+const cmdLists: {[name: string]: {
+  id: string,
+  name: string,
+  elem: HTMLDivElement,
+  option: Option
+}} = {};
+
+function updateCmdList(id:string, cmdFileContent: any) {
+  let cmdList = cmdLists[id];
+  if (!cmdList) {
+    return;
+  }
+  cmdList.elem.innerHTML = '';
+  const commandGroups = cmdFileContent;
+  for (let groupName of Object.keys(commandGroups)) {
+    const groupElm = document.createElement("div");
+    const groupNameElm = document.createElement("div");
+    groupNameElm.innerHTML = groupName;
+    groupNameElm.className = "group-name";
+    groupElm.append(groupNameElm);
+    cmdList.elem.append(groupElm);
+    const commends = commandGroups[groupName].commands;
+    for (let cmdLabel of Object.keys(commends)) {
+      const row = document.createElement("div");
+      row.className = "button-row";
+      const cmdBtn = document.createElement("vscode-button");
+      cmdBtn.textContent = cmdLabel;
+      cmdBtn.setAttribute('cmd', commends[cmdLabel].cmd);
+      row.append(cmdBtn);
+      groupElm.append(row);
+      cmdBtn.addEventListener('click', function(e){
+        if (e.target instanceof Button) {
+          vscode.postMessage({ command: 'run-cmd-in-current-term', text: e.target?.getAttribute('cmd') });
+        }
+      });
+    }
+    const devider = document.createElement("vscode-divider");
+    cmdList.elem.append(devider);
+  }
+  return cmdList;
+}
+
+function newCmdList(id: string, name: string, cmdFilecontent: any) {
+  const fileDropdown = document.getElementById("J_openingFileList") as Dropdown;
+  if (!cmdLists[id]) {
+    const option = document.createElement("vscode-option") as Option;
+    option.setAttribute("value", id);
+    option.innerHTML = name;
+    fileDropdown?.appendChild(option);
+    cmdLists[id] = {
+      id,
+      name,
+      elem: document.createElement("div"),
+      option
+    };
+  }
+  setTimeout(() => {cmdLists[id].option.selected = true;}, 0);
+  updateCmdList(id, cmdFilecontent);
+  changeCmdList(id);
+}
+
+
+function changeCmdList(id:string) {
+  const commandList = document.getElementById("J_cmdList");
+  const cmdList = cmdLists[id];
+  if (cmdList) {
+    if (currentCmdListId !== id) {
+      if (!!currentCmdListId) {
+        commandList?.removeChild(cmdLists[currentCmdListId].elem);
+      }
+      currentCmdListId = id;
+    }
+    commandList?.append(cmdList.elem);
+  }
+}
+
+document.getElementById("J_openingFileList")?.addEventListener("change", e => {
+  const id = e.detail?.selectedOptions[0].value;
+  changeCmdList(id);
+});
+
+document.getElementById("J_openNewFile")?.addEventListener("click", e => {
+  vscode.postMessage({
+    command: "open-new-file"
+  });
+});
+
+window.addEventListener("message", event => {
+  const message = event.data;
+  console.log(message);
+  switch(message.type) {
+    case 'cmd-file-loaded':
+      newCmdList(message.id, message.fileName, message.fileContent);
+      break;
+    case 'cmd-update':
+      updateCmdList(message.id, message.fileContent); 
+      break;
+  }
+});
+
+window.addEventListener("load", main);
+
+function main() {
+  vscode.postMessage({
+    command: "webwiew-ready"
+  });
+}
